@@ -79,8 +79,8 @@ async function fetchAndDisplayMoneyLine() {
         
                 for (const bookmaker of bookmakers) {
                     const outcomes = bookmaker.markets[0].outcomes;
-                    homeTeamOdds.push(outcomes[1].price); // Away team's odds
-                    awayTeamOdds.push(outcomes[0].price); // Home team's odds
+                    homeTeamOdds.push(outcomes[0].price); // Away team's odds
+                    awayTeamOdds.push(outcomes[1].price); // Home team's odds
                 }
         
                 const homeTeamAvgOdds = homeTeamOdds.reduce((sum, odd) => sum + odd, 0) / homeTeamOdds.length;
