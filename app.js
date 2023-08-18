@@ -1,6 +1,6 @@
 const moneyLineBtn = document.getElementById("moneyLineBtn");
 const spreadBtn = document.getElementById("spreadBtn");
-const playerPropsBtn = document.getElementById("playerPropsBtn");
+//const playerPropsBtn = document.getElementById("playerPropsBtn");
 const contentDiv = document.getElementById("content");
 
 
@@ -136,4 +136,177 @@ function clearContent() {
     contentDiv.innerHTML = "";
     moneyLineContent.innerHTML = ""; // Clear money line content
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+spreadBtn.addEventListener("click", fetchAndDisplaySpread);
+
+async function fetchAndDisplaySpread() {
+    clearContent();
+    
+    try {
+        const response = await fetch(
+            "https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=62ecb41efc6195b8f07ba217cf7a5b47&regions=us&markets=spreads&oddsFormat=american"
+        );
+
+        const data = await response.json();
+                //console.log(data);
+       
+            const spreadContent = document.getElementById("spreadContent");
+            spreadContent.innerHTML = "<h2>Spread Odds</h2>";
+
+            for (const event of data) {
+                // Extract data from the API response
+              
+                const homeTeamName = event.home_team;
+             
+                const awayTeamName = event.away_team;
+                const bookmakers = event.bookmakers;
+                
+                // Create arrays to hold data for each team's spreads
+                if (bookmakers.length > 0){
+                const homeTeamSpreads = [];
+                const awayTeamSpreads = [];
+                
+            
+                // Loop through bookmakers to gather spread data
+
+
+                for (const bookmaker of bookmakers) {
+                    const outcomes = bookmaker.markets[0].outcomes;
+                    console.log(outcomes);
+                    // Find the team's spread based on its name
+                    const homeTeamSpread = outcomes.find(outcome => outcome.name === homeTeamName);
+                    const awayTeamSpread = outcomes.find(outcome => outcome.name === awayTeamName);
+            
+                    // Push the spread and odds to the respective arrays
+                    homeTeamSpreads.push({ spread: homeTeamSpread.point, odds: homeTeamSpread.price });
+                    awayTeamSpreads.push({ spread: awayTeamSpread.point, odds: awayTeamSpread.price });
+                }
+            
+                // Calculate the implied probabilities for each spread
+                const homeTeamImpliedProbabilities = homeTeamSpreads.map(spread => calculateImpliedProbability(spread.odds));
+               
+                const awayTeamImpliedProbabilities = awayTeamSpreads.map(spread => calculateImpliedProbability(spread.odds));
+            
+                // Find the minimum spread that covers other higher spreads
+                const homeTeamMinSpread = findMinSpreadCoveringHigher(homeTeamSpreads);
+                const awayTeamMinSpread = findMinSpreadCoveringHigher(awayTeamSpreads);
+            
+                // Calculate the implied probability for each team based on the minimum spread
+                let homeTeamImpliedProbability;
+                let awayTeamImpliedProbability
+                const homeTeamImpliedProbabilityIndex = homeTeamSpreads.findIndex(spread => spread.spread === homeTeamMinSpread);
+                if (homeTeamImpliedProbabilityIndex !== -1) {
+                     homeTeamImpliedProbability = homeTeamImpliedProbabilities[homeTeamImpliedProbabilityIndex];
+                  
+                } else {
+                    moneyLineContent.innerHTML += `
+                        <p>${event.sport_title}: ${homeTeamName} vs ${awayTeamName}</p>
+                        <p>No implied probability data available for this spread.</p>
+                        <hr>
+                    `;
+                }
+                const awayTeamImpliedProbabilityIndex = awayTeamSpreads.findIndex(spread => spread.spread === awayTeamMinSpread);
+                if (awayTeamImpliedProbabilityIndex !== -1) {
+                     awayTeamImpliedProbability = awayTeamImpliedProbabilities[awayTeamImpliedProbabilityIndex];
+                    // Rest of your code
+                } else {
+                    moneyLineContent.innerHTML += `
+                        <p>${event.sport_title}: ${awayTeamName} vs ${awayTeamName}</p>
+                        <p>No implied probability data available for this spread.</p>
+                        <hr>
+                    `;
+                }
+
+
+              
+                
+            
+                // Determine the color bar class based on implied probability
+                const colorBarClass = homeTeamImpliedProbability !== undefined
+        ? getColorBarClass(homeTeamImpliedProbability, awayTeamImpliedProbability)
+        : '';
+            
+                // Display the data on the UI
+                moneyLineContent.innerHTML += `
+                    <p>${event.sport_title}: ${homeTeamName} vs ${awayTeamName}</p>
+                    <p>Team with higher implied probability: ${homeTeamImpliedProbability > awayTeamImpliedProbability ? homeTeamName : awayTeamName}</p>
+                    <p>Higher Implied Probability: ${Math.max(homeTeamImpliedProbability, awayTeamImpliedProbability).toFixed(2)}</p>
+                    <div class="color-bar ${colorBarClass}"></div>
+                    <hr>
+                `;
+            }
+            else {
+                moneyLineContent.innerHTML += `
+                <p>${event.sport_title}: ${homeTeamName} vs ${awayTeamName}</p>
+                <p>No spread data available for this event.</p>
+                <hr>
+            `;
+        } 
+
+        }
+        
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
+}
+
+
+function calculateImpliedProbability(odds) {
+    
+    if (odds > 0) {
+        
+        return 100 / (odds + 100);
+    } else {
+        
+        return -odds / (-odds + 100);
+    }
+}
+
+function findMinSpreadCoveringHigher(spreads) {
+
+    let minSpread = spreads[0].spread;
+    
+    for (const spread of spreads) {
+        if (spread.spread < minSpread) {
+            if (spreads.some(otherSpread => otherSpread.spread >= spread.spread)) {
+                minSpread = spread.spread;
+            }
+        }
+    }
+    
+    return minSpread;
+}
+
+function getColorBarClass(homeTeamImpliedProbability, awayTeamImpliedProbability) {
+    const higherImpliedProbability = Math.max(homeTeamImpliedProbability, awayTeamImpliedProbability);
+    
+    if (higherImpliedProbability >= 0.72) {
+        return "red-bar";
+    } else if (higherImpliedProbability > 0.6 && higherImpliedProbability < 0.72) {
+        return "yellow-bar";
+    } else {
+        return "faint-yellow-bar";
+    }
+}
+
+
+
+
+
+
+       
+
 
