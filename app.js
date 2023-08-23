@@ -1,5 +1,6 @@
 const moneyLineBtn = document.getElementById("moneyLineBtn");
 const spreadBtn = document.getElementById("spreadBtn");
+const playerPropsBtn = document.getElementById("playerPropsBtn");
 //const playerPropsBtn = document.getElementById("playerPropsBtn");
 const contentDiv = document.getElementById("content");
 
@@ -150,7 +151,11 @@ function clearContent() {
 
 
 
-spreadBtn.addEventListener("click", fetchAndDisplaySpread);
+
+spreadBtn.addEventListener("click", () => {
+    bookmakerDropdown.removeAttribute("hidden");
+    fetchAndDisplaySpread(); // Call the function to fetch and display the spread data
+});
 
 async function fetchAndDisplaySpread() {
     clearContent();
@@ -165,9 +170,50 @@ async function fetchAndDisplaySpread() {
        
             const spreadContent = document.getElementById("spreadContent");
             spreadContent.innerHTML = "<h2>Spread Odds</h2>";
+            const bookmakerDropdown = document.getElementById("bookmakerDropdown");
 
             for (const event of data) {
                 // Extract data from the API response
+              
+
+    // Create arrays to hold data for each team's spreads
+    const homeTeamSpreads = [];
+    const awayTeamSpreads = [];
+
+            
+
+              
+
+                const selectedBookmakerName = bookmakerDropdown.value; // Get the selected bookmaker
+                const desiredBookmaker = event.bookmakers.find(bookmaker => bookmaker.name === selectedBookmakerName);
+
+if (desiredBookmaker) {
+    const desiredOutcomes = desiredBookmaker.markets[0].outcomes;
+
+    // Calculate implied probabilities using desired bookmaker's odds
+    const homeTeamImpliedProbabilities = homeTeamSpreads.map(spread =>
+        calculateImpliedProbability(spread.odds)
+    );
+    const awayTeamImpliedProbabilities = awayTeamSpreads.map(spread =>
+        calculateImpliedProbability(spread.odds)
+    );
+
+    // Calculate average spread for this event across all bookmakers
+    const avgHomeSpread = homeTeamSpreads.reduce((sum, spread) => sum + spread.spread, 0) / homeTeamSpreads.length;
+    const avgAwaySpread = awayTeamSpreads.reduce((sum, spread) => sum + spread.spread, 0) / awayTeamSpreads.length;
+
+    // Calculate spread difference factor and modify implied probabilities
+    for (let i = 0; i < homeTeamImpliedProbabilities.length; i++) {
+        const spreadDifferenceFactor = Math.abs(homeTeamSpreads[i].spread - avgHomeSpread) +
+            Math.abs(awayTeamSpreads[i].spread - avgAwaySpread);
+
+        homeTeamImpliedProbabilities[i] *= (1 + spreadDifferenceFactor);
+        awayTeamImpliedProbabilities[i] *= (1 + spreadDifferenceFactor);
+    }
+
+    // Rest of your code
+}
+
               
                 const homeTeamName = event.home_team;
              
@@ -301,6 +347,146 @@ function getColorBarClass(homeTeamImpliedProbability, awayTeamImpliedProbability
         return "faint-yellow-bar";
     }
 }
+
+
+
+
+
+
+
+playerPropsBtn.addEventListener("click", function(){
+    fetchUpcomingEvents();
+});
+
+const eventSelectionContainer = document.getElementById("eventSelectionContainer");
+
+const nextButton = document.getElementById("nextButton");
+
+async function fetchUpcomingEvents() {
+    clearContent();
+    try {
+        const response = await fetch(
+            "https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=62ecb41efc6195b8f07ba217cf7a5b47&regions=us&markets=h2h"
+        );
+
+        const data = await response.json();
+        populateEventSelectionContainer(data);
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
+}
+
+function populateEventSelectionContainer(eventsData) {
+    eventSelectionContainer.innerHTML = ''; // Clear existing content
+    const textElement = document.createElement("p");
+    textElement.textContent = "Please only choose one event at a time:";
+    eventSelectionContainer.appendChild(textElement);
+
+    eventsData.forEach(event => {
+        const eventDiv = document.createElement("div");
+        eventDiv.classList.add("event-item");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = event.id;
+        checkbox.setAttribute("data-sport-key", event.sport_key);
+
+        const label = document.createElement("label");
+        label.textContent = `${event.sport_title}: ${event.home_team} vs ${event.away_team}`;
+        label.appendChild(checkbox);
+
+        eventDiv.appendChild(label);
+        eventSelectionContainer.appendChild(eventDiv);
+    });
+    nextButton.style.display = "block";
+}
+
+nextButton.addEventListener("click", handleNextButtonClick);
+
+function handleNextButtonClick() {
+    clearContent();
+    const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    
+    if (selectedCheckboxes.length !== 1) {
+        // Handle case where more or less than one event is selected
+        return;
+    }
+
+    const selectedCheckbox = selectedCheckboxes[0];
+    const selectedEventId = selectedCheckbox.value;
+    const selectedSportKey = selectedCheckbox.getAttribute("data-sport-key");
+    console.log("key:" + selectedEventId);
+    console.log("value:" + selectedSportKey);
+    // Call the function to fetch player props using selectedSportKey and selectedEventId
+    fetchPlayerProps(selectedSportKey, selectedEventId);
+}
+
+const probabilityResults = document.getElementById("probabilityResults");
+async function fetchPlayerProps(selectedSportKey, selectedEventId) {
+    try {
+        const response = await fetch(
+            `https://api.the-odds-api.com/v4/sports/${selectedSportKey}/events/${selectedEventId}/odds?apiKey=62ecb41efc6195b8f07ba217cf7a5b47&regions=us&markets=totals&Format=american`
+        );
+
+        const data = await response.json();
+        // Now you can process the player props data
+        //console.log(data);
+        calculatePlayerPropsProbabilities(data);
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
+}
+function calculatePlayerPropsProbabilities(playerPropsData) {
+    // Iterate through bookmakers in the player props data
+    for (const bookmaker of playerPropsData.bookmakers) {
+        const bookmakerName = bookmaker.title;
+        const outcomes = bookmaker.markets[0].outcomes;
+        console.log(outcomes);
+
+        // Assuming you have a way to select the desired outcome (Over/Under)
+        const selectedOutcome = outcomes.find(outcome => outcome.name === "Over");
+
+        if (selectedOutcome) {
+            const selectedOdds = selectedOutcome.price;
+            const propType = selectedOutcome.name;
+            const category = "totals";
+
+            // Calculate probabilities using the selected bookmaker's odds
+            const impliedProbability = calculateImpliedProbability(selectedOdds);
+
+            // Calculate average odds for the selected outcome across all bookmakers
+            const averageOdds = outcomes.reduce((sum, outcome) => sum + outcome.price, 0) / outcomes.length;
+
+            // Calculate a factor based on the difference between selected odds and average odds
+            const oddsDifferenceFactor = Math.abs(selectedOdds - averageOdds);
+
+            // Modify implied probability based on the odds difference factor
+            const modifiedImpliedProbability = impliedProbability * (1 + oddsDifferenceFactor);
+
+            // Now you can display or use the calculated probabilities as needed
+            const colorBarClass = getColorBarClass(impliedProbability, modifiedImpliedProbability);
+probabilityResults.innerHTML = `
+    <p>Bookmaker: ${bookmakerName}</p>
+    <p>Prop Type: ${propType}</p>
+    <p>Category: ${category}</p>
+    <p>Implied Probability: ${impliedProbability}</p>
+    <p>Modified Implied Probability: ${modifiedImpliedProbability}</p>
+    <div class="color-bar ${colorBarClass}"></div>
+    <hr>
+`;
+
+        }
+    }
+}
+
+
+    
+    // Call the function to fetch and populate the event selection dropdown
+    
+    
+
+
+
 
 
 
