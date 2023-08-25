@@ -3,20 +3,28 @@ const spreadBtn = document.getElementById("spreadBtn");
 const playerPropsBtn = document.getElementById("playerPropsBtn");
 //const playerPropsBtn = document.getElementById("playerPropsBtn");
 const contentDiv = document.getElementById("content");
+const spreadContentHeading = document.getElementById("spreadContentHeading");
+const bookmakerDropdown = document.getElementById("bookmakerDropdown");
 
 
 
 function displayContent(option) {
     // Clear previous content
+    clearContent();
     contentDiv.innerHTML = "";
 
     // Display content based on the selected option
+  
+
     if (option === "moneyLine") {
         contentDiv.innerHTML = "<p>Display Money Line content here.</p>";
+        nextButton.style.display = "none"; // Hide the nextButton
     } else if (option === "spread") {
         contentDiv.innerHTML = "<p>Display Spread content here.</p>";
+        nextButton.style.display = "none"; // Hide the nextButton
     } else if (option === "playerProps") {
         contentDiv.innerHTML = "<p>Display Player Props content here.</p>";
+        nextButton.style.display = "block"; // Show the nextButton
     }
 }
 
@@ -59,6 +67,7 @@ keyDiv.innerHTML = `
 
 async function fetchAndDisplayMoneyLine() {
     clearContent();
+    
     
     try {
         const response = await fetch(
@@ -134,8 +143,21 @@ async function fetchAndDisplayMoneyLine() {
 
 
 function clearContent() {
+    
+
+
     contentDiv.innerHTML = "";
-    moneyLineContent.innerHTML = ""; // Clear money line content
+    moneyLineContent.innerHTML = "";
+    spreadContent.innerHTML = "";
+    probabilityResults.innerHTML = "";
+    eventSelectionContainer.innerHTML = ""; // Clear event selection content
+     nextButton.style.display = "none";
+     bookmakerDropdown.setAttribute("hidden", "");
+    // bookmakerDropdown.style.display = "none";
+
+
+
+  
 }
 
 
@@ -152,9 +174,14 @@ function clearContent() {
 
 
 
+
 spreadBtn.addEventListener("click", () => {
+    clearContent(); 
+    
+    bookmakerDropdown.style.display = "block";
     bookmakerDropdown.removeAttribute("hidden");
-    fetchAndDisplaySpread(); // Call the function to fetch and display the spread data
+    fetchAndDisplaySpread();
+   
 });
 
 async function fetchAndDisplaySpread() {
@@ -169,8 +196,8 @@ async function fetchAndDisplaySpread() {
                 //console.log(data);
        
             const spreadContent = document.getElementById("spreadContent");
-            spreadContent.innerHTML = "<h2>Spread Odds</h2>";
-            const bookmakerDropdown = document.getElementById("bookmakerDropdown");
+            spreadContent.innerHTML = "<h2 id='spreadContentHeading'>Spread Odds</h2>";
+           
 
             for (const event of data) {
                 // Extract data from the API response
@@ -363,6 +390,8 @@ const eventSelectionContainer = document.getElementById("eventSelectionContainer
 const nextButton = document.getElementById("nextButton");
 
 async function fetchUpcomingEvents() {
+   
+
     clearContent();
     try {
         const response = await fetch(
@@ -404,13 +433,17 @@ function populateEventSelectionContainer(eventsData) {
 nextButton.addEventListener("click", handleNextButtonClick);
 
 function handleNextButtonClick() {
-    clearContent();
+    
+    
+   
+    //clearContent();
     const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
     
     if (selectedCheckboxes.length !== 1) {
         // Handle case where more or less than one event is selected
         return;
     }
+    nextButton.disabled = true; // Disable the button
 
     const selectedCheckbox = selectedCheckboxes[0];
     const selectedEventId = selectedCheckbox.value;
@@ -434,6 +467,8 @@ async function fetchPlayerProps(selectedSportKey, selectedEventId) {
         calculatePlayerPropsProbabilities(data);
     } catch (error) {
         console.error("An error occurred:", error);
+    } finally {
+        nextButton.disabled = false; // Re-enable the button
     }
 }
 function calculatePlayerPropsProbabilities(playerPropsData) {
@@ -476,7 +511,10 @@ probabilityResults.innerHTML = `
 `;
 
         }
+       
+       
     }
+    nextButton.disabled = false; // Disable the button
 }
 
 
