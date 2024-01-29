@@ -1,0 +1,45 @@
+/* PlayerProps.css */
+
+.sport-selection,
+.event-selection,
+.prop-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 20px;
+  justify-content: center;
+  background-color: #333;
+  color: white;
+}
+
+.sport-selection button,
+.event-selection button,
+.prop-selection button {
+  cursor: pointer;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+.sport-selection button:hover,
+.event-selection button:hover,
+.prop-selection button:hover {
+  background-color: #0056b3;
+}
+
+.prop-details {
+  margin: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.prop-details h3 {
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}

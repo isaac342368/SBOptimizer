@@ -1,0 +1,67 @@
+
+  
+  .event-spread {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .league {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+  }
+  body {
+    font-size: 1em;
+  }
+  
+  .matchup {
+    font-size: 1em;
+    color: #666;
+    margin: 10px 0;
+  }
+  
+  .spreads {
+    font-size: 0.9em;
+    color: #333;
+  }
+  
+  .probability-bar {
+    height: 5px;
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .high-probability {
+    background-color: #4caf50; /* Green for high probability */
+  }
+  
+  .med-probability {
+    background-color: #ffeb3b; /* Yellow for medium probability */
+  }
+  
+  .low-probability {
+    background-color: #f44336; /* Red for low probability */
+  }
+  
+  @media (max-width: 768px) {
+    .event-spread {
+      padding: 10px;
+    }
+  
+    .league {
+      font-size: 1em;
+    }
+  
+    .matchup {
+      font-size: 0.9em;
+    }
+  
+    .spreads {
+      font-size: 0.8em;
+    }
+  }
+  

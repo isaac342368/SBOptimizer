@@ -1,64 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>SB Optimizer</title>
-    
-    <link rel="icon" type="image/png" href="Sports-betting.png">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-</head>
-<body>
-    <div class="container">
-        <h1>Sports Betting Optimizer</h1>
-        <div class="options">
-            <button id="moneyLineBtn">Money Line</button>
-            <button id="spreadBtn">Spread</button>
-            <button id="playerPropsBtn">Player Props</button>
-            
-        </div>
-        <div id="content" class="content-box"></div>
-        
-        <div id="moneyLineContent" class="content-box"></div>
-        <div id="spreadContent"></div>
-        <div id="eventSelectionContainer">
-       
-           
-        </div>
-        <button id="nextButton" style="display: none;">Next</button>
-        <div id="probabilityResults"></div>
-
-
-
-        <div class="key">
-            <div class="key-item">
-                <div class="color-box red-bar"></div>
-                <span>Highly Recommended (Implied Probability >= 72%)</span>
-            </div>
-            <div class="key-item">
-                <div class="color-box yellow-bar"></div>
-                <span>Moderately Recommended (Implied Probability > 60% and < 72%)</span>
-            </div>
-            <div class="key-item">
-                <div class="color-box faint-yellow-bar"></div>
-                <span>Recommended (Implied Probability >= 50% and <= 60%)</span>
-            </div>
-            <div >
-               
-                <select id="bookmakerDropdown" hidden>
-                    <option value="FanDuel">Fanduel</option>
-                    <option value="DraftKings">DraftKings</option>
-                    <option value="BetMGM">BetMGM</option>
-                    <option value="BetRivers">BetRivers</option>
-                    <option value="PointsBet">PointsBet</option>
-                    
-                </select>
-            </div>
-            
-        </div>
-        
-    </div>
-    <script src="app.js"></script>
-</body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
-
