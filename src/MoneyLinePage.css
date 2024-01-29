@@ -1,0 +1,92 @@
+/* MoneyLine.css */
+
+.money-line-container {
+    width: auto;
+    padding: 25px;
+   
+    background-color:  #161515;
+    
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  body {
+    font-size: 1em;
+  }
+  
+  /* Use a grid layout for the events with responsive breakpoints */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* This creates a responsive grid */
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+  }
+  
+  .event-card {
+    background-color: #333;
+    color: #333;
+    border-radius: 10px;
+    border-left: 5px solid transparent; /* Placeholder for the color bar */
+
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2); 
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space inside the card */
+  }
+  .event-card2 {
+    color: white;
+    background-color: #333;
+    color: #333;
+    border-radius: 10px;
+    border-left: 5px solid transparent; /* Placeholder for the color bar */
+
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2); 
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distributes space inside the card */
+  }
+  .event-card:hover {
+    transform: translateY(-5px); /* Slight rise effect on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Slightly more pronounced shadow on hover */
+  }
+  .event-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: white;
+  }
+ 
+  
+  .probability-info {
+    margin-top: 10px;
+    color: #C0C0C0;
+  }
+  
+  .probability-bar {
+    height: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+    background-color: #ddd; /* Default color, will be overwritten by class */
+  }
+  
+  /* Probability classes */
+  .high-probability { background-color: #4CAF50; }
+  .med-probability { background-color: #FFEB3B; }
+  .low-probability { background-color: #F44336; }
+  
+  
+  .key-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+  }
+  
+  h2 {
+    text-align: center;
+  }
